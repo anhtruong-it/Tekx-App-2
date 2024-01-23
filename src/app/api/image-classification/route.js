@@ -3,7 +3,6 @@ import { list } from '@vercel/blob';
 import axios from 'axios';
 import { issues } from '@/components/issue';
 
-
 export async function POST(request) {
   const { searchParams } = new URL(request.url);
   const filename = searchParams.get('filename');
@@ -13,12 +12,6 @@ export async function POST(request) {
     // Find an existing image in Vercel Blob
     const blobs = await list();
     const matchingBlob = blobs.blobs.find((blob) => blob.pathname == filename);
-
-    // ML to recognize an image by text
-    const apiMLIssueType = `https://alt-text-generator.vercel.app/api/generate?imageUrl=${matchingBlob.url}`;
-    const responseIssueType = await axios.get(apiMLIssueType);
-    const issueType = responseIssueType.data;
-    let updateIssueType = issueType.replace("Caption: ");
 
     // Make a random issue
     const getRandomIssue = () => {
@@ -33,7 +26,7 @@ export async function POST(request) {
     updatedBlob.filename = matchingBlob.pathname;
     updatedBlob.projectId = projectId;
     updatedBlob.issue = {
-      issueType: updateIssueType,
+      issueType: randomIssue.issueType,
       riskRating: randomIssue.riskRating,
       action: randomIssue.action,
       rectificationPrice: randomIssue.rectificationPrice,
