@@ -1,6 +1,4 @@
-// components/LoadingButton.js
-
-
+// A button component
 const LoadingButton = ({ variant = 'blue', text = 'Loading...' }) => {
   return (
     <button

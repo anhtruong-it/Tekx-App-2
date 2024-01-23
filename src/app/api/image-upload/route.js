@@ -5,21 +5,16 @@ export async function POST(request) {
   const { searchParams } = new URL(request.url);
   const filename = searchParams.get('filename');
 
-
   try {
     const formData = await request.formData();
 
-    // Access the file and additional data from the FormData object
+    // Access the file data
     const file = formData.get('file');
-    const projectId = formData.get('projectId');
-    console.log("projectId: ", projectId);
 
-    // App Router Route Handlers
+    // Upload image file using vercel blob
     const blob = await put(filename, file, {
       access: 'public',
     });
-
-    console.log("body: ", [blob.url, blob.pathname, projectId]);
 
     return NextResponse.json(blob);
   } catch (error) {
@@ -27,3 +22,5 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Error reading FormData' }, { status: 500 });
   }
 }
+
+
