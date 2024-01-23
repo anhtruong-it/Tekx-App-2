@@ -1,5 +1,5 @@
 "use client";
-import LoadingButton from "@/components/loadingButton";
+import LoadingButton from "@/components/loading-button";
 import { useState, useRef } from "react";
 
 export default function UploadForm() {
