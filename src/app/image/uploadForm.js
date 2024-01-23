@@ -6,28 +6,33 @@ export default function UploadForm() {
   const inputFileRef = useRef(null);
   const [blob, setBlob] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [projectId, setProjectId] = useState('');
 
   const handleUpload = async (event) => {
     event.preventDefault();
 
     const file = inputFileRef.current.files[0];
+    
 
     try {
-      // Set uploading state to true
       setUploading(true);
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('projectId', projectId);
+
 
       const response = await fetch(`/api/image?filename=${file.name}`, {
         method: 'POST',
-        body: file,
+        body: formData,
       });
 
       const newBlob = await response.json();
-      console.log(newBlob);
-
-      // Set the new blob in the state
+      
       setBlob(newBlob);
+      console.log(newBlob);
+      
     } finally {
-      // Reset uploading state to false
       setUploading(false);
       
     }
@@ -41,17 +46,12 @@ export default function UploadForm() {
         <LoadingButton variant="blue" text="Uploading..." />
       ) : (
         <form onSubmit={handleUpload}>
-          <input name="file" ref={inputFileRef} type="file" required />
+          <input name='projectId' type='number' placeholder='Enter Project ID' value={projectId} onChange={(e) => setProjectId(e.target.value)} required
+          className="border border-gray-300 rounded-md p-2 text-black"/>
+          <input name="file" ref={inputFileRef} type="file" accept='image/*' required />
           <button type="submit">Upload</button>
         </form>
       )}
-
-      {/* {blob && (
-        // Test URL uploaded image
-        <div>
-          Blob url: <a href={blob.url}>{blob.url}</a>
-        </div>
-      )} */}
     </>
   );
 }
