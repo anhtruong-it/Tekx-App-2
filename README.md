@@ -1,6 +1,6 @@
 This is a [Next.js](https://nextjs.org/) project with Vercel Blob.
 
-This project use to upload image to Vercel Blob and classify image by Machine Learning.
+This project use to upload image to Vercel Blob and classify image.
 
 ## Getting Started
 
