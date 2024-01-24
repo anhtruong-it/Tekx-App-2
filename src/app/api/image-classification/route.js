@@ -1,9 +1,29 @@
 import { NextResponse } from 'next/server';
 import { list } from '@vercel/blob';
-import axios from 'axios';
-import { issues } from '@/components/issue';
+import issueMockData from '/issue-mock-data.json';
 
-export async function POST(request) {
+// Get a random issue
+const getRandomIssue = () => {
+  const randomIndex = Math.floor(Math.random() * issueMockData.issues.length);
+  return issueMockData.issues[randomIndex];
+};
+
+// Update blob with issue information
+const updateBlobWithRandomIssue = (blob, projectId) => {
+  const randomIssue = getRandomIssue();
+  const { pathname, size, uploadedAt, ...updatedBlob } = blob;
+  updatedBlob.filename = blob.pathname;
+  updatedBlob.projectId = projectId;
+  updatedBlob.issue = {
+    issueType: randomIssue.issueType,
+    riskRating: randomIssue.riskRating,
+    action: randomIssue.action,
+    rectificationPrice: randomIssue.rectificationPrice,
+  };
+  return updatedBlob;
+};
+
+export const POST = async (request) => {
   const { searchParams } = new URL(request.url);
   const filename = searchParams.get('filename');
   const projectId = searchParams.get('projectId');
@@ -13,28 +33,16 @@ export async function POST(request) {
     const blobs = await list();
     const matchingBlob = blobs.blobs.find((blob) => blob.pathname == filename);
 
-    // Make a random issue
-    const getRandomIssue = () => {
-      const randomIndex = Math.floor(Math.random() * issues.length);
-      return issues[randomIndex];
+    if (!matchingBlob) {
+      return NextResponse.error('Blob not found', { status: 404 });
     }
 
-    const randomIssue = getRandomIssue();
-
-    // Filter out essential attributes
-    const { pathname, size, uploadedAt, ...updatedBlob } = matchingBlob;
-    updatedBlob.filename = matchingBlob.pathname;
-    updatedBlob.projectId = projectId;
-    updatedBlob.issue = {
-      issueType: randomIssue.issueType,
-      riskRating: randomIssue.riskRating,
-      action: randomIssue.action,
-      rectificationPrice: randomIssue.rectificationPrice,
-    };
+    // Update blob with random issue information
+    const updatedBlob = updateBlobWithRandomIssue(matchingBlob, projectId);
 
     return NextResponse.json(updatedBlob);
   } catch (error) {
-    console.error('Error listing blobs: ', error);
+    console.error('Error processing request: ', error);
     return NextResponse.error('Internal Server Error', { status: 500 });
   }
-}
+};
